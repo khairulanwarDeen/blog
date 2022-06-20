@@ -2,16 +2,16 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: posts-depl
-spec: 
+spec:
   replicas: 1
-  selector: 
+  selector:
     matchLabels:
       app: posts
   template:
     metadata:
       labels:
         app: posts
-    spec: 
+    spec:
       containers:
         - name: posts
-          image: abanoir/posts:0.0.1
+          image: cygnetops/posts-76

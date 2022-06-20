@@ -1,47 +1,30 @@
-const express = require ('express');
+const express = require('express');
 const bodyParser = require('body-parser');
 const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json());
 
-const handleEvent = async (type, data) => {
-    if (type === 'CommentCreated'){
-        const status = data.content.includes('orange')? 'rejected' : 'approved';
-    
-        await axios.post('http://localhost:4005/events', {
-            type: 'CommentModerated',
-            data: {
-                id: data.id,
-                postId: data.postId,
-                status,
-                content: data.content
-            }
-        })
-    }
-}
-
-//This is where we receive events posted here
 app.post('/events', async (req, res) => {
-    const { type, data } = req.body;
+  const { type, data } = req.body;
 
-    handleEvent(type, data);
+  if (type === 'CommentCreated') {
+    const status = data.content.includes('orange') ? 'rejected' : 'approved';
 
-    res.send({});
+    await axios.post('http://localhost:4005/events', {
+      type: 'CommentModerated',
+      data: {
+        id: data.id,
+        postId: data.postId,
+        status,
+        content: data.content
+      }
+    });
+  }
+
+  res.send({});
 });
 
-app.listen(4003, async () => {
-    console.log("Listening on 4003");
-
-    try {
-        const res = await axios.get('http://localhost:4005/events');
-
-        for (let event of res.data) {
-            console.log("Processing event:", event.type);
-
-            handleEvent(event.type, event.data)
-        }
-    } catch (error) {
-        console.log(error.message);
-    }
-})
+app.listen(4003, () => {
+  console.log('Listening on 4003');
+});
